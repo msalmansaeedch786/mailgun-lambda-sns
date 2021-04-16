@@ -73,7 +73,7 @@ Follow the below steps to test the solution:
 
 - After the Infrastructure is deployed successfully, make sure to accept the confirmation email from AWS SNS Service
 
-- Terraform will show you the API Invoke URL for the POST method, copy the URL and add the different webhooks in the **Mailgun Dashboard** using the API URL. Afterwards, there is python script **mailgun.py** in test folder which can be used to send email using mailgun service
+- Terraform will show you the **API_Invoke_URL** for the POST method, copy the URL and add the different webhooks in the **Mailgun Dashboard** using the API URL. Afterwards, there is python script **mailgun.py** in test folder which can be used to send email using mailgun service
 
 Run it:
 
