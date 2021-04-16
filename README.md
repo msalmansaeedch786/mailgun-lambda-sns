@@ -1,14 +1,14 @@
 # Mailgun - Lambda - SNS
 
-AWS Lambda Function that is proxied to an AWS API Gateway sends notification using AWS SNS triggering on Webhooks and stores the results in AWS S3. 
+AWS Lambda Function that is proxied to an AWS API Gateway sends notification using AWS SNS which trigged on events and stores the results in AWS S3.
 
 ## Getting Started
 
-This project is build and AWS Lambda Function that triggered when an email goes out via [Mailgun](mailgun.com). Once it’s out Mailgun sends various events back (open, clicked, etc). The moment wehn an an email sent out via Mailgun, we now have those events with us via webhooks, hitting an API Gateway and that information is proxied to a Lambda. The Lambda will firt of all save a copy of the raw webhook and store it in any storage avilable i.e AWS S3 and publish a transformed version of the raw webhook into AWS SNS or using any publishing service.
+This project is about building an AWS Lambda Function that triggered when an email goes out via [Mailgun](mailgun.com). Once its out, Mailgun sends various events back (open, clicked, etc). The moment wehn an an email sent out via Mailgun, we can track the email through those events via webhooks. The webhook put a POST request to an API Gateway and that information is proxied to a Lambda. The Lambda will first of all save a copy of the raw webhook and store it in any storage avilable i.e AWS S3 and publish a transformed version of the raw webhook into AWS SNS or using any publishing service.
 
 ## Design Choices and Implementation
 
-For the provision of the infrastrcuture, Terraform is being used for IaC (Infrastructure as Code) to setup different AWS Services inlucding:
+For the provisioning of the infrastrcuture, Terraform is being used for IaC (Infrastructure as Code) to setup different AWS Services inlucding:
 
 * AWS Lambda Function
 * AWS API Gatewat
@@ -22,19 +22,11 @@ Lambda function payload (**lambda_function_payload.zip**) contains the package f
 - aws_sns.py (Contains AWS SNS Publishing Service)
 - aws_ssm.py (Contains AWS SSM Secret Management Service)
 
-The lambda function first parse the event and extract the requried values then it validates the webhook from mailgun. Store the event (raw webhook) data into the AWS S3 data store, also notify the endpoint user about different events from mailgun webhooks through AWS SNS publishing service.
+The lambda function first parse the information coming from the mailgun event and extract the requried values and then it validates the webhook from mailgun. Store the event (raw webhook) data into the AWS S3 data store, also notify the endpoint user about different events from mailgun webhooks through AWS SNS publishing service.
 
 ## Architecture Flow Diagram
 
-                           
-                            ___________________
-      ______________       |  ______    _____  |        _______________ 
-     |              |      | |DNS   |  |TLS  | |       |  Cloudflare   | 
-     |   Clients    |----->| |Server|..|Tran | |-----> |DNS (TLS)- 853 |
-     |______________|      | |_(53)_|  |sport| |       |_______________|
-                           |___________________|
-                           
-
+![mailgun_lambda_sns](./architecture_flow_diagram.png)
 
 ## Terraform Setup
 
@@ -69,15 +61,23 @@ To run this project:
 
 ## Testing:
 
-After the infrastructure is deployed successfully:
+Follow the below steps to test the solution:
 
-- Make sure to accept the confirmation email from AWS SNS Service
+- Make sure Mailgun Dashboard is setup and **HTTP webhook signing key** should be generated
 
-- Terraform will show you the API Invoke URL for the POST method, copy the URL and attach it with the Mailgun dashboard Sending Webhooks. Afterwards there is Mailgun sending python code **mailgun.py** in mailgun folder. 
+- Copy the HTTP webhook signing key and paste it in the **secrets.tf** file
+
+- Place your email address in the variable named **sns_topic_subscription_endpoint** in **terraform.tfvars**
+
+- Deploy the Infrastructure through Terraform as defined above in [Steps](#terraform-setup)
+
+- After the Infrastructure is deployed successfully, make sure to accept the confirmation email from AWS SNS Service
+
+- Terraform will show you the API Invoke URL for the POST method, copy the URL and add the different webhooks in the **Mailgun Dashboard** using the API URL. Afterwards, there is python script **mailgun.py** in test folder which can be used to send email using mailgun service
 
 Run it:
 
 ```
-  python ./mailgun/mailgun.py
+  python ./mailgun.py
 ```
 ***Note: Configure the code properly with the appropriate values i.e YOUR_DOMAIN_NAME and YOUR_API_KEY***

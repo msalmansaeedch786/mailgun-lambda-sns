@@ -23,20 +23,28 @@ def lambda_handler(event, context):
         "type"      : "email " + str(mailgun_event)
     }
 
+    # extracting the requried values coming from the mailgun event
     webhook_signing_key = SSM.ssm_get_parameter(os.environ['webhook_signing_key'])
-    print(webhook_signing_key)
     s3_bucket_name = os.environ['s3_bucket_name']
     sns_topic_arn = os.environ['sns_topic_arn']
     
     if verify(webhook_signing_key, token, timestamp, signature):
+        
+        # storing raw webhook in AWS S3 data store
         S3.s3_store(json.dumps(result), s3_bucket_name, 'raw_webhook_'+str(timestamp)+'.json')
+
+        # publishing transformed webhook via AWS SNS service
         SNS.sns_publish(sns_topic_arn, message)
+
     else:
-        print('Invalid Signing Key for the Webhook')
+        return {
+            'statusCode': 400,
+            'body': json.dumps('Invalid Signing Key for the Webhook')
+        }  
     
     return {
         'statusCode': 200,
-        'body': json.dumps('Hello from Lambda!')
+        'body': json.dumps('Lambda Executed Successfully!')
     }
 
 def verify(signing_key, token, timestamp, signature):
