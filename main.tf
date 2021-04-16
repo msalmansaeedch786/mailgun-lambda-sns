@@ -208,7 +208,7 @@ resource "aws_api_gateway_stage" "this" {
   stage_name    = "dev"
 }
 
-output "API Invoke URL" {
+output "API_Invoke_URL" {
   description = "API Invoke URL"
   value       = "${aws_api_gateway_stage.this.invoke_url}${aws_api_gateway_resource.this.path}"
 }
