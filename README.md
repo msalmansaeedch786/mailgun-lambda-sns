@@ -25,6 +25,8 @@ Lambda function payload (**lambda_function_payload.zip**) contains the package f
 
 The lambda function first parse the information coming from the mailgun event and extract the requried values and then it validates the webhook from mailgun. Store the event (raw webhook) data into the AWS S3 data store, also notify the endpoint user about different events from mailgun webhooks through AWS SNS publishing service.
 
+***Note: Make sure to create a lambda_function_payload.zip again in case if you change anything in the source code of lambda***
+
 ## Architecture Flow Diagram
 
 ![mailgun_lambda_sns](./architecture_flow_diagram.png)
