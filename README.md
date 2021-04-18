@@ -92,7 +92,7 @@ Follow the below steps to test the solution:
 
 - Terraform will show you the **API_Invoke_URL** for the POST method, copy the URL and add the different webhooks in the **Mailgun Dashboard** using the API URL
 
-- Afterwards, there is python script **mailgun.py** in test folder which can be used to send email using mailgun service
+- Afterwards, there is python script **mailgun.py** in **mailgun_test** folder, which can be used to send email using mailgun service
 
   - Type the following commands to install the **dependencies** and **execute** it:
 
