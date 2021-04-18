@@ -21,6 +21,7 @@ Lambda function payload (**lambda_function_payload.zip**) contains the package f
 - aws_s3.py (Contains AWS S3 Storage Service)
 - aws_sns.py (Contains AWS SNS Publishing Service)
 - aws_ssm.py (Contains AWS SSM Secret Management Service)
+- lambda_handler.py (Contains the Lambda Function Handler)
 
 The lambda function first parse the information coming from the mailgun event and extract the requried values and then it validates the webhook from mailgun. Store the event (raw webhook) data into the AWS S3 data store, also notify the endpoint user about different events from mailgun webhooks through AWS SNS publishing service.
 
@@ -35,28 +36,44 @@ The lambda function first parse the information coming from the mailgun event an
 To run this project:
 
 - Initialize the terraform with plugin and provider:
-```
-  terraform init
-```
+
+  ```
+    terraform init
+  ```
 
 - To confirm what resources are going to be added in the infrastructure:
-```
-  terraform plan
-```
+
+  ```
+    terraform plan
+  ```
 
 - To validate the infrastructure code for any error:
-```
-  terraform validate
-```
+
+  ```
+    terraform validate
+  ```
 
 - To apply the infrastructure changes:
-```
-  terraform apply
-```
+
+  ```
+    terraform apply
+  ```
 
 - To destroy the infrastructure changes:
+
+  ```
+    terraform destroy
+  ```
+
+## Linting
+
+Lint the lambda function python source-code for bugs and quality checker using pylint as:
+
 ```
-  terraform destroy
+pip install pylint (if not installed already)
+```
+```
+pylint -rn lambda_function_payload/*.py || true
 ```
 
 ## Testing:
@@ -73,11 +90,15 @@ Follow the below steps to test the solution:
 
 - After the Infrastructure is deployed successfully, make sure to accept the confirmation email from AWS SNS Service
 
-- Terraform will show you the **API_Invoke_URL** for the POST method, copy the URL and add the different webhooks in the **Mailgun Dashboard** using the API URL. Afterwards, there is python script **mailgun.py** in test folder which can be used to send email using mailgun service
+- Terraform will show you the **API_Invoke_URL** for the POST method, copy the URL and add the different webhooks in the **Mailgun Dashboard** using the API URL
 
-Run it:
+- Afterwards, there is python script **mailgun.py** in test folder which can be used to send email using mailgun service
 
-```
-  python ./mailgun.py
-```
-***Note: Configure the code properly with the appropriate values i.e YOUR_DOMAIN_NAME and YOUR_API_KEY***
+  - Type the following commands to install the **dependencies** and **execute** it:
+
+    ```
+    pip install -r ./requirements.txt
+    
+    python ./mailgun.py
+    ```
+  ***Note: Configure the code properly with the appropriate values i.e YOUR_DOMAIN_NAME and YOUR_API_KEY***

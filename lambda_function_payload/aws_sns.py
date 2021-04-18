@@ -1,13 +1,17 @@
+"""This module publish message using AWS SNS"""
 import json
 import boto3
 
 client = boto3.client('sns')
 
 class SNS:
+    """AWS SNS Client"""
 
-    def sns_publish (topic_arn, message):
+    def sns_publish(self, topic_arn, message):
+        """deliver the message using publish method"""
         response = client.publish(
             TopicArn=topic_arn,
             Message=json.dumps({'default': json.dumps(message)}),
             MessageStructure='json'
         )
+        return response
