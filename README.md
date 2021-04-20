@@ -31,9 +31,42 @@ The lambda function first parse the information coming from the mailgun event an
 
 ![mailgun_lambda_sns](./architecture_flow_diagram.png)
 
+## Linting
+
+Lint the lambda function python source-code for bugs and quality checker using pylint as:
+
+```
+pip install pylint    (if not installed already)
+```
+```
+pylint -rn lambda_function_payload/*.py || true
+```
+
+## Pre-Infra Steps:
+
+Follow the below steps to ready the environment for infrastructure deployment:
+
+- Make sure Mailgun Dashboard is setup and **HTTP webhook signing key** should be generated
+
+- Create **secrets.tf** file and copy the HTTP webhook signing key, paste it in the **secrets.tf** file as:
+
+  ```
+    variable "ssm_webhook_signing_key_value" {
+      type        = string
+      description = "signing key for the validation of webhook"
+      default     = "<Signing_Key_Value>"
+    }
+  ```
+
+- Make sure to update the variables for the backend.tf to store the terraform state file. This bucket should be created before deploying the infrastructure.
+
+- Place your email address in the variable named `sns_topic_subscription_endpoint` in **terraform.tfvars**
+
+- Deploy the Infrastructure through Terraform as defined below in [Steps](#terraform-setup)
+
 ## Terraform Setup
 
-***Terraform should be installed on the machine, you want to setup the project alongwith the aws cli installed and default profile is set with appropriate Access and Secret Keys***
+***Terraform should be installed on the machine you want to setup the project alongwith the aws cli installed and default profile is set with appropriate Access and Secret Keys***
 
 To run this project:
 
@@ -67,42 +100,15 @@ To run this project:
     terraform destroy
   ```
 
-## Linting
+## Post-Infra Steps
 
-Lint the lambda function python source-code for bugs and quality checker using pylint as:
+Follow the below steps to test the environment:
 
-```
-pip install pylint (if not installed already)
-```
-```
-pylint -rn lambda_function_payload/*.py || true
-```
-
-## Testing:
-
-Follow the below steps to test the solution:
-
-- Make sure Mailgun Dashboard is setup and **HTTP webhook signing key** should be generated
-
-- Create **secrets.tf** file and opy the HTTP webhook signing key, paste it in the **secrets.tf** file as:
-
-  ```
-    variable "ssm_webhook_signing_key_value" {
-      type        = string
-      description = "signing key for the validation of webhook"
-      default     = "<Signing_Key_Value>"
-    }
-  ```
-
-- Place your email address in the variable named **sns_topic_subscription_endpoint** in **terraform.tfvars**
-
-- Deploy the Infrastructure through Terraform as defined above in [Steps](#terraform-setup)
-
-- After the Infrastructure is deployed successfully, make sure to accept the confirmation email from AWS SNS Service
+- After the Infrastructure is deployed successfully, make sure to accept the confirmation email from ***AWS SNS Service***
 
 - Terraform will show you the **API_Invoke_URL** for the POST method, copy the URL and add the different webhooks in the **Mailgun Dashboard** using the API URL
 
-- Afterwards, there is python script **mailgun.py** in **mailgun_test** folder, which can be used to send email using mailgun service
+- Afterwards, there is python script `mailgun.py` in **mailgun_test** folder, which can be used to send email using mailgun service
 
   - Type the following commands to install the **dependencies** and **execute** it:
 
@@ -112,3 +118,5 @@ Follow the below steps to test the solution:
     python ./mailgun.py
     ```
   ***Note: Configure the code properly with the appropriate values i.e YOUR_DOMAIN_NAME and YOUR_API_KEY***
+
+- You can also test it through ***Mailgun Test Webhook*** in Mailgun Dashboard
