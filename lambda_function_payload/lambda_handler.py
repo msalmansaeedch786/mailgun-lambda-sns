@@ -11,6 +11,11 @@ from aws_ssm import SSM
 def lambda_handler(event, _context):
     """This function will stores data in AWS S3, publish message using AWS SNS after verification"""
 
+    # initializing clients
+    s3 = S3()
+    sns = SNS()
+    ssm = SSM()
+
     result = json.loads(event['body'])
     print(result)
 
@@ -28,14 +33,14 @@ def lambda_handler(event, _context):
     }
 
     # getting the parameters from the environment to be passed to different functions
-    webhook_signing_key = SSM.ssm_get_parameter(os.environ['webhook_signing_key'])
+    webhook_signing_key = ssm.ssm_get_parameter(os.environ['webhook_signing_key'])
     s3_bucket_name = os.environ['s3_bucket_name']
     sns_topic_arn = os.environ['sns_topic_arn']
 
     if verify(webhook_signing_key, token, timestamp, signature):
 
         # storing raw webhook in AWS S3 data store
-        S3.s3_store(
+        s3.s3_store(
             json.dumps(result),
             s3_bucket_name,
             'raw_webhook_' +
@@ -43,7 +48,7 @@ def lambda_handler(event, _context):
             '.json')
 
         # publishing transformed webhook via AWS SNS service
-        SNS.sns_publish(sns_topic_arn, message)
+        sns.sns_publish(sns_topic_arn, message)
 
     else:
         return {
