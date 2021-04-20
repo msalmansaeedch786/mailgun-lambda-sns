@@ -84,7 +84,15 @@ Follow the below steps to test the solution:
 
 - Make sure Mailgun Dashboard is setup and **HTTP webhook signing key** should be generated
 
-- Copy the HTTP webhook signing key and paste it in the **secrets.tf** file
+- Create **secrets.tf** file and opy the HTTP webhook signing key, paste it in the **secrets.tf** file as:
+
+  ```
+    variable "ssm_webhook_signing_key_value" {
+      type        = string
+      description = "signing key for the validation of webhook"
+      default     = "<Signing_Key_Value>"
+    }
+  ```
 
 - Place your email address in the variable named **sns_topic_subscription_endpoint** in **terraform.tfvars**
 
